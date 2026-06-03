@@ -1,10 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank of Mobile Applications</title>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -19,6 +18,8 @@
             --success: #10b981;
             --error: #ef4444;
             --border: #334155;
+            --btn-wrong-quiz: #f59e0b;
+            --btn-wrong-quiz-hover: #d97706;
         }
 
         * {
@@ -251,6 +252,20 @@
             color: var(--text-muted);
             line-height: 1.6;
         }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-wrong-only {
+            background-color: var(--btn-wrong-quiz);
+        }
+
+        .btn-wrong-only:hover {
+            background-color: var(--btn-wrong-quiz-hover);
+        }
     </style>
 </head>
 <body>
@@ -261,14 +276,12 @@
     </header>
 
     <div class="quiz-container" id="quiz-box">
-        <!-- الواجهة التفاعلية للأسئلة -->
         <div id="question-screen">
             <div class="stats-bar">
                 <div class="jump-container">
-                    <span>السؤال:</span>
+                    <span id="nav-label">السؤال:</span>
                     <select id="question-nav" class="question-selector" onchange="jumpToQuestion(this.value)">
-                        <!-- سيتم تعبئة أرقام الأسئلة برمجياً هنا -->
-                    </select>
+                        </select>
                 </div>
                 <div class="score-boxes">
                     <div class="score-tag correct" id="correct-count">✔ 0</div>
@@ -284,27 +297,29 @@
             <div class="question-text" id="question-body">جاري تحميل السؤال...</div>
 
             <div class="options-container" id="options-box">
-                <!-- الأزرار هتتولد هنا بالجافا سكريبت -->
-            </div>
+                </div>
 
             <button class="nav-btn" id="next-btn" disabled onclick="nextQuestion()">السؤال التالي</button>
         </div>
 
-        <!-- واجهة النتيجة النهائية -->
         <div class="result-screen" id="result-screen">
-            <h2>🎉 اكتمل الاختبار!</h2>
+            <h2 id="result-title">🎉 اكتمل الاختبار!</h2>
             <div class="score-circle">
                 <div class="percentage" id="final-percent">0%</div>
                 <div class="ratio" id="final-ratio">0 / 0</div>
             </div>
             <p class="summary-text" id="final-summary">لقد أتممت مراجعة بنك الأسئلة لمادة تطبيقات الموبايل بنجاح.</p>
-            <button class="nav-btn" onclick="resetQuiz()">إعادة الاختبار من جديد</button>
+            
+            <div class="result-actions">
+                <button class="nav-btn btn-wrong-only" id="retry-wrong-btn" onclick="startWrongQuestionsQuiz()">إعادة اختبار الأسئلة الخاطئة فقط ✖</button>
+                <button class="nav-btn" onclick="resetQuiz()">إعادة الاختبار الكامل من جديد 🔄</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // مصفوفة البيانات الضخمة التي تحتوي على كل أسئلة البنك الـ 84 المرفقة
-        const quizData = [
+        // مصفوفة البيانات الضخمة الأصلية التي تحتوي على الـ 84 سؤالاً كاملاً
+        const masterQuizData = [
             // Lecture 1 - MCQs
             { lec: "Lecture 1", type: "MCQ", q: "Flutter relies entirely on a single programming language to build its logic and interfaces. What is this language?", answers: ["JavaScript", "Swift", "Dart", "Koltin"], correct: 2 },
             { lec: "Lecture 1", type: "MCQ", q: "In the Flutter architecture, what is the concept that describes the fact that every element you see on the screen is a software component?", answers: ["Databases", "Conditions", "Loops", "Everything is a widget"], correct: 3 },
@@ -402,13 +417,20 @@
             { lec: "Lecture 6", type: "TF", q: "Translating animation is used to rotate the object around its axis.", answers: ["True (صح)", "False (خطأ)"], correct: 1 }
         ];
 
+        // مصفوفة ديناميكية تعمل كمستودع للأسئلة النشطة حالياً في الجلسة الامتحانية
+        let activeQuizData = [...masterQuizData];
+        // مصفوفة تجمع الكائنات للأسئلة التي يخطئ فيها المستخدم أثناء تقدمه
+        let wrongQuestionsList = [];
+
         let currentIndex = 0;
         let correctScore = 0;
         let wrongScore = 0;
         let optionSelected = false;
+        let isReviewingWrongOnly = false; // راية لمعرفة نوع وضع الاختبار الحالي
 
         // استدعاء العناصر من الـ DOM
         const questionNav = document.getElementById("question-nav");
+        const navLabel = document.getElementById("nav-label");
         const correctCount = document.getElementById("correct-count");
         const wrongCount = document.getElementById("wrong-count");
         const barFill = document.getElementById("bar-fill");
@@ -419,44 +441,53 @@
 
         const questionScreen = document.getElementById("question-screen");
         const resultScreen = document.getElementById("result-screen");
+        const resultTitle = document.getElementById("result-title");
         const finalPercent = document.getElementById("final-percent");
         const finalRatio = document.getElementById("final-ratio");
+        const retryWrongBtn = document.getElementById("retry-wrong-btn");
 
-        // دالة لإنشاء قائمة الخيارات السريعة برمجياً عند بدء التشغيل للـ 84 سؤال بالكامل
-        function initDropdown() {
+        // دالة لإنشاء وتحديث قائمة الانتقال السريع بحسب عدد الأسئلة النشطة
+        function updateNavigationDropdown() {
             questionNav.innerHTML = "";
-            quizData.forEach((_, index) => {
+            activeQuizData.forEach((_, index) => {
                 const opt = document.createElement("option");
                 opt.value = index;
                 opt.textContent = `${index + 1}`;
                 questionNav.appendChild(opt);
             });
+            
+            // في وضع مراجعة الأخطاء نخفي كلمة "السؤال" ونعرض بدلاً منها تنبيه
+            if (isReviewingWrongOnly) {
+                navLabel.textContent = "خطأ رقم:";
+            } else {
+                navLabel.textContent = "السؤال:";
+            }
         }
 
-        // دالة تشغيل وعرض السؤال الحالي
+        // دالة عرض وسحب السؤال النشط حالياً إلى الشاشة
         function loadQuestion() {
             optionSelected = false;
             nextBtn.disabled = true;
             optionsBox.innerHTML = "";
 
-            if (currentIndex >= quizData.length) {
+            if (currentIndex >= activeQuizData.length) {
                 showResults();
                 return;
             }
 
-            const currentData = quizData[currentIndex];
+            const currentData = activeQuizData[currentIndex];
 
-            // تحديث قيمة الاختيار السريع في الـ Dropdown ليعكس مكانك الحالي
+            // ضبط مؤشر القائمة المنسدلة ليتوافق مع مؤشر السؤال الحالي
             questionNav.value = currentIndex;
             
             lectureTitle.textContent = currentData.lec;
             questionBody.textContent = currentData.q;
 
             // حساب ورسم نسبة شريط التقدم الأزرق
-            const progressPercent = ((currentIndex) / quizData.length) * 100;
+            const progressPercent = ((currentIndex) / activeQuizData.length) * 100;
             barFill.style.width = `${progressPercent}%`;
 
-            // بناء أزرار الخيارات التفاعلية
+            // توليد أزرار الخيارات الإجابة
             currentData.answers.forEach((ans, index) => {
                 const button = document.createElement("button");
                 button.className = "option-btn";
@@ -472,66 +503,116 @@
             loadQuestion();
         }
 
-        // دالة التحقق من صحة الإجابة وضبط الألوان التفاعلية فوراً
+        // دالة تصحيح وتقييم الإجابة المختارة فورياً مع فرز الأخطاء
         function checkAnswer(selectedIndex, clickedButton) {
-            if (optionSelected) return; // منع الضغط المتعدد
+            if (optionSelected) return;
             optionSelected = true;
 
-            const currentData = quizData[currentIndex];
+            const currentData = activeQuizData[currentIndex];
             const allButtons = optionsBox.querySelectorAll(".option-btn");
 
-            // تعطيل كافة الأزرار فور الضغط
             allButtons.forEach(btn => btn.disabled = true);
 
             if (selectedIndex === currentData.correct) {
-                // إجابة صحيحة
                 clickedButton.classList.add("correct-ans");
                 correctScore++;
                 correctCount.textContent = `✔ ${correctScore}`;
             } else {
-                // إجابة خاطئة
                 clickedButton.classList.add("wrong-ans");
-                // إظهار الإجابة الصحيحة بلونها الأخضر للمساعدة في المذاكرة
                 allButtons[currentData.correct].classList.add("correct-ans");
                 wrongScore++;
                 wrongCount.textContent = `✖ ${wrongScore}`;
+
+                // إضافة السؤال الخالي من قائمة أخطائك إذا لم يكن مضافاً مسبقاً في وضع المراجعة
+                if (!wrongQuestionsList.some(item => item.q === currentData.q)) {
+                    wrongQuestionsList.push(currentData);
+                }
             }
 
             nextBtn.disabled = false;
         }
 
-        // الانتقال للسؤال التالي
+        // دالة الانتقال للسؤال التالي
         function nextQuestion() {
             currentIndex++;
             loadQuestion();
         }
 
-        // عرض الشاشة النهائية وحساب الإحصائيات
+        // حساب وإظهار واجهة النتيجة النهائية مع التحكم بأزرار الخيارات الإضافية
         function showResults() {
             questionScreen.style.display = "none";
             resultScreen.style.display = "block";
             barFill.style.width = "100%";
 
-            const percentage = Math.round((correctScore / quizData.length) * 100);
+            const totalActive = activeQuizData.length;
+            const percentage = Math.round((correctScore / totalActive) * 100);
+            
             finalPercent.textContent = `${percentage}%`;
-            finalRatio.textContent = `${correctScore} / ${quizData.length}`;
+            finalRatio.textContent = `${correctScore} / ${totalActive}`;
+
+            if (isReviewingWrongOnly) {
+                resultTitle.textContent = "🏁 اكتملت مراجعة الأخطاء!";
+            } else {
+                resultTitle.textContent = "🎉 اكتمل الاختبار!";
+            }
+
+            // إخفاء أو إظهار زر مراجعة الأخطاء بناء على وجود أخطاء في الذاكرة
+            if (wrongQuestionsList.length > 0) {
+                retryWrongBtn.style.display = "block";
+                retryWrongBtn.textContent = `إعادة اختبار الأسئلة الخاطئة فقط (✖ ${wrongQuestionsList.length})`;
+            } else {
+                retryWrongBtn.style.display = "none"; // إخفاء تماماً لو النتيجة 100%
+                resultTitle.textContent = "🏆 عبقري! تقفيل كامل 100%";
+            }
         }
 
-        // إعادة تشغيل الاختبار من الصفر
-        function resetQuiz() {
+        // دالة إطلاق جلسة مراجعة الأخطاء (إعادة اختبار المحتوى الخاطئ فقط)
+        function startWrongQuestionsQuiz() {
+            if (wrongQuestionsList.length === 0) return;
+
+            // استبدال مصفوفة الأسئلة النشطة بقائمة الأخطاء المجمعة
+            activeQuizData = [...wrongQuestionsList];
+            
+            // تصفير العدادات والرايات للجلسة الجديدة
+            wrongQuestionsList = []; 
             currentIndex = 0;
             correctScore = 0;
             wrongScore = 0;
+            isReviewingWrongOnly = true;
+
             correctCount.textContent = "✔ 0";
             wrongCount.textContent = "✖ 0";
+
+            // تحديث محتويات الشاشات والقوائم المنسدلة
             resultScreen.style.display = "none";
             questionScreen.style.display = "block";
+            
+            updateNavigationDropdown();
             loadQuestion();
         }
 
-        // تشغيل التطبيق تلقائياً عند الفتح
+        // دالة إعادة تصفير النظام وبدء البنك الماستر الشامل (84 سؤال)
+        function resetQuiz() {
+            activeQuizData = [...masterQuizData];
+            wrongQuestionsList = [];
+            currentIndex = 0;
+            correctScore = 0;
+            wrongScore = 0;
+            isReviewingWrongOnly = false;
+
+            correctCount.textContent = "✔ 0";
+            wrongCount.textContent = "✖ 0";
+            
+            resultScreen.style.display = "none";
+            questionScreen.style.display = "block";
+            
+            updateNavigationDropdown();
+            loadQuestion();
+        }
+
+        // بدء التشغيل وبناء عناصر واجهة المستخدم تلقائياً
         window.onload = function() {
-            initDropdown();
+            updateNavigationDropdown();
             loadQuestion();
         };
     </script>
