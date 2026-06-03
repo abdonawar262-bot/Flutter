@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -77,10 +77,25 @@
             margin-bottom: 20px;
             font-weight: 600;
             font-size: 0.9rem;
+            gap: 10px;
         }
 
-        .progress-box {
+        .jump-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
             color: var(--text-muted);
+        }
+
+        .question-selector {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
         }
 
         .score-boxes {
@@ -249,7 +264,12 @@
         <!-- الواجهة التفاعلية للأسئلة -->
         <div id="question-screen">
             <div class="stats-bar">
-                <div class="progress-box" id="progress-text">سؤال 1 / 84</div>
+                <div class="jump-container">
+                    <span>السؤال:</span>
+                    <select id="question-nav" class="question-selector" onchange="jumpToQuestion(this.value)">
+                        <!-- سيتم تعبئة أرقام الأسئلة برمجياً هنا -->
+                    </select>
+                </div>
                 <div class="score-boxes">
                     <div class="score-tag correct" id="correct-count">✔ 0</div>
                     <div class="score-tag wrong" id="wrong-count">✖ 0</div>
@@ -388,7 +408,7 @@
         let optionSelected = false;
 
         // استدعاء العناصر من الـ DOM
-        const progressText = document.getElementById("progress-text");
+        const questionNav = document.getElementById("question-nav");
         const correctCount = document.getElementById("correct-count");
         const wrongCount = document.getElementById("wrong-count");
         const barFill = document.getElementById("bar-fill");
@@ -401,6 +421,17 @@
         const resultScreen = document.getElementById("result-screen");
         const finalPercent = document.getElementById("final-percent");
         const finalRatio = document.getElementById("final-ratio");
+
+        // دالة لإنشاء قائمة الخيارات السريعة برمجياً عند بدء التشغيل للـ 84 سؤال بالكامل
+        function initDropdown() {
+            questionNav.innerHTML = "";
+            quizData.forEach((_, index) => {
+                const opt = document.createElement("option");
+                opt.value = index;
+                opt.textContent = `${index + 1}`;
+                questionNav.appendChild(opt);
+            });
+        }
 
         // دالة تشغيل وعرض السؤال الحالي
         function loadQuestion() {
@@ -415,8 +446,9 @@
 
             const currentData = quizData[currentIndex];
 
-            // تحديث شريط البيانات العلوي
-            progressText.textContent = `سؤال ${currentIndex + 1} / ${quizData.length}`;
+            // تحديث قيمة الاختيار السريع في الـ Dropdown ليعكس مكانك الحالي
+            questionNav.value = currentIndex;
+            
             lectureTitle.textContent = currentData.lec;
             questionBody.textContent = currentData.q;
 
@@ -432,6 +464,12 @@
                 button.onclick = () => checkAnswer(index, button);
                 optionsBox.appendChild(button);
             });
+        }
+
+        // دالة القفز الفوري لأي سؤال يتم اختياره من القائمة
+        function jumpToQuestion(indexValue) {
+            currentIndex = parseInt(indexValue);
+            loadQuestion();
         }
 
         // دالة التحقق من صحة الإجابة وضبط الألوان التفاعلية فوراً
@@ -492,7 +530,10 @@
         }
 
         // تشغيل التطبيق تلقائياً عند الفتح
-        window.onload = loadQuestion;
+        window.onload = function() {
+            initDropdown();
+            loadQuestion();
+        };
     </script>
 </body>
 </html>
