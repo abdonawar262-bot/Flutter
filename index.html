@@ -3,260 +3,496 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إختبار تطبيقات الهاتف المحمول</title>
+    <title>Bank of Mobile Applications</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0f19;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #334155;
         }
-        .quiz-container {
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
             width: 100%;
             max-width: 500px;
-            background-color: #111827;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .quiz-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            box-sizing: border-box;
-        }
-        .header-stats {
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             display: flex;
-            align-items: center;
+            flex-direction: column;
+        }
+
+        .stats-bar {
+            display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        .counters {
-            display: flex;
-            gap: 10px;
-        }
-        .counter {
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
             align-items: center;
-            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-        .counter.correct-count { background-color: #065f46; color: #34d399; }
-        .counter.wrong-count { background-color: #7f1d1d; color: #f87171; }
-        .progress-section {
+
+        .progress-box {
+            color: var(--text-muted);
+        }
+
+        .score-boxes {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-grow: 1;
-            justify-content: flex-end;
+            gap: 8px;
         }
-        .progress-text {
-            font-size: 16px;
-            color: #9ca3af;
-            font-weight: 500;
+
+        .score-tag {
+            padding: 4px 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.85rem;
         }
+
+        .score-tag.correct { background-color: var(--success); }
+        .score-tag.wrong { background-color: var(--error); }
+
         .progress-bar-container {
-            width: 100px;
-            height: 8px;
-            background-color: #374151;
-            border-radius: 4px;
+            width: 100%;
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 3px;
+            margin-bottom: 20px;
             overflow: hidden;
         }
+
         .progress-bar {
             height: 100%;
-            background-color: #6366f1;
             width: 0%;
+            background-color: var(--primary);
             transition: width 0.3s ease;
         }
-        .question-text {
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            text-align: left;
-            direction: ltr;
-            min-height: 80px;
+
+        .lecture-badge {
+            align-self: flex-start;
+            background-color: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
         }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
+
         .option-btn {
-            background-color: #1f2937;
-            border: 2px solid transparent;
-            border-radius: 14px;
-            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
             text-align: left;
-            direction: ltr;
-            color: #e5e7eb;
-            font-size: 16px;
-            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
             transition: all 0.2s ease;
-        }
-        .option-btn:hover {
-            background-color: #374151;
-        }
-        .option-btn.selected {
-            border-color: #6366f1;
-            background-color: #312e81;
-        }
-        .option-btn.correct-visual {
-            background-color: #065f46;
-            color: #34d399;
-        }
-        .option-btn.wrong-visual {
-            background-color: #7f1d1d;
-            color: #f87171;
-        }
-        .nav-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
         }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+
+        .option-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-color: var(--text-muted);
+        }
+
+        .option-btn.correct-ans {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--success) !important;
+            color: var(--success) !important;
+        }
+
+        .option-btn.wrong-ans {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--error) !important;
+            color: var(--error) !important;
+        }
+
+        .nav-btn {
+            background-color: var(--primary);
+            color: #fff;
             border: none;
-            transition: background 0.2s;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
         }
-        .btn-next {
-            background-color: #a5b4fc;
-            color: #1e1b4b;
+
+        .nav-btn:hover {
+            background-color: var(--primary-hover);
         }
-        .btn-next:hover { background-color: #818cf8; }
-        .btn-prev {
-            background-color: transparent;
-            color: #9ca3af;
-            border: 1px solid #374151;
+
+        .nav-btn:disabled {
+            background-color: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
         }
-        .btn-prev:hover { background-color: #1f2937; }
-        
+
         .result-screen {
             text-align: center;
-            padding: 20px 0;
+            display: none;
         }
-        .result-score {
-            font-size: 48px;
-            font-weight: bold;
-            color: #6366f1;
-            margin: 20px 0;
+
+        .result-screen h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .score-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 6px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+        }
+
+        .score-circle .percentage {
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+
+        .score-circle .ratio {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .summary-text {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
-    <!-- شاشة الإختبار الرئيسي -->
-    <div id="quiz-screen">
-        <div class="header-stats">
-            <div class="counters">
-                <div class="counter correct-count"><span id="correct-label">0</span> ✓</div>
-                <div class="counter wrong-count"><span id="wrong-label">0</span> ✕</div>
-            </div>
-            <div class="progress-section">
-                <span class="progress-text"><span id="current-idx-text">1</span> / <span id="total-text">78</span></span>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="progress-bar"></div>
+    <header>
+        <h1>Bank of Mobile Applications</h1>
+        <p>DR/Abeer Bedeir • 2025/2026</p>
+    </header>
+
+    <div class="quiz-container" id="quiz-box">
+        <!-- الواجهة التفاعلية للأسئلة -->
+        <div id="question-screen">
+            <div class="stats-bar">
+                <div class="progress-box" id="progress-text">سؤال 1 / 84</div>
+                <div class="score-boxes">
+                    <div class="score-tag correct" id="correct-count">✔ 0</div>
+                    <div class="score-tag wrong" id="wrong-count">✖ 0</div>
                 </div>
             </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="bar-fill"></div>
+            </div>
+
+            <div class="lecture-badge" id="lecture-title">Lecture 1</div>
+            <div class="question-text" id="question-body">جاري تحميل السؤال...</div>
+
+            <div class="options-container" id="options-box">
+                <!-- الأزرار هتتولد هنا بالجافا سكريبت -->
+            </div>
+
+            <button class="nav-btn" id="next-btn" disabled onclick="nextQuestion()">السؤال التالي</button>
         </div>
 
-        <div class="question-text" id="question-text">جاري تحميل السؤال...</div>
-        
-        <div class="options-container" id="options-container"></div>
-
-        <div class="nav-buttons">
-            <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">التالي</button>
-            <button class="btn btn-prev" id="prev-btn" onclick="prevQuestion()">رجوع</button>
+        <!-- واجهة النتيجة النهائية -->
+        <div class="result-screen" id="result-screen">
+            <h2>🎉 اكتمل الاختبار!</h2>
+            <div class="score-circle">
+                <div class="percentage" id="final-percent">0%</div>
+                <div class="ratio" id="final-ratio">0 / 0</div>
+            </div>
+            <p class="summary-text" id="final-summary">لقد أتممت مراجعة بنك الأسئلة لمادة تطبيقات الموبايل بنجاح.</p>
+            <button class="nav-btn" onclick="resetQuiz()">إعادة الاختبار من جديد</button>
         </div>
     </div>
 
-    <!-- شاشة النتيجة النهائية -->
-    <div id="result-screen" class="result-screen" style="display: none;">
-        <h2>النتيجة النهائية للاختبار</h2>
-        <div class="result-score" id="final-score">0 / 78</div>
-        <p id="result-comment" style="color: #9ca3af; font-size: 16px;"></p>
-        <button class="btn btn-next" onclick="restartQuiz()" style="margin-top: 20px;">إعادة الاختبار</button>
-    </div>
-</div>
+    <script>
+        // مصفوفة البيانات الضخمة التي تحتوي على كل أسئلة البنك الـ 84 المرفقة
+        const quizData = [
+            // Lecture 1 - MCQs
+            { lec: "Lecture 1", type: "MCQ", q: "Flutter relies entirely on a single programming language to build its logic and interfaces. What is this language?", answers: ["JavaScript", "Swift", "Dart", "Koltin"], correct: 2 },
+            { lec: "Lecture 1", type: "MCQ", q: "In the Flutter architecture, what is the concept that describes the fact that every element you see on the screen is a software component?", answers: ["Databases", "Conditions", "Loops", "Everything is a widget"], correct: 3 },
+            { lec: "Lecture 1", type: "MCQ", q: "Which of the following widgets is used to arrange elements horizontally (side by side)?", answers: ["Column Widget", "Button Widget", "Row Widget", "Text Widget"], correct: 2 },
+            { lec: "Lecture 1", type: "MCQ", q: "Flutter relies on a specific design system provided by Google to ensure consistent user experience. What is it?", answers: ["Blueprint Design", "iOS Style", "Classic Windows UI", "Material Design"], correct: 3 },
+            { lec: "Lecture 1", type: "MCQ", q: "The journey of building a professional application begins with the design phase. What are the common tools mentioned for this phase?", answers: ["Figma / Adobe", "Notepad", "Python / C++", "Excel / Word"], correct: 0 },
+            { lec: "Lecture 1", type: "MCQ", q: "Which file must I declare a service in Android?", answers: ["styles.xml", "AndroidManifest.xml", "activity_main.xml", "build.gradle"], correct: 1 },
+            { lec: "Lecture 1", type: "MCQ", q: "What is used to stop a service?", answers: ["stopIntent()", "stopService()", "pauseService()", "cancelService()"], correct: 1 },
+            // Lecture 1 - T/F
+            { lec: "Lecture 1", type: "TF", q: "Connecting the widget to Dart Logic is the final step in the app-building journey to ensure it's ready for launch.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 1", type: "TF", q: "Flutter supports Android and iOS with a single codebase.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 1", type: "TF", q: "The conditional statement function is for displaying images only.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 1", type: "TF", q: "Container allows the developer to control the aesthetic appearance of flutter designs.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 1", type: "TF", q: "Flutter writes a single snippet code that works across multiple platforms without needing to rewrite it.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 1", type: "TF", q: "The service in Android does not require a user interface to run.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
 
-<script>
-const quizData = [
-    { q: "1. Flutter relies entirely on a single programming language to build its logic and interfaces. What is this language?", o: ["JavaScript", "Swift", "Dart", "Kotlin"], a: 2 },
-    { q: "2. In the Flutter architecture, what is the concept that describes the fact that every element you see on the screen is a software component?", o: ["Databases", "Conditions", "Loops", "Everything is a widget"], a: 3 },
-    { q: "3. Which of the following widgets is used to arrange elements horizontally (side by side)?", o: ["Column Widget", "Button Widget", "Row Widget", "Text Widget"], a: 2 },
-    { q: "4. Flutter relies on a specific design system provided by Google to ensure consistent user experience. What is it?", o: ["Blueprint Design", "iOS Style", "Classic Windows UI", "Material Design"], a: 3 },
-    { q: "5. The journey of building a professional application begins with the design phase. What are the common tools mentioned for this phase?", o: ["Figma / Adobe", "Notepad", "Python / C++", "Excel / Word"], a: 0 },
-    { q: "6. Which file must I declare a service in Android?", o: ["styles.xml", "AndroidManifest.xml", "activity_main.xml", "build.gradle"], a: 1 },
-    { q: "7. What is used to stop a service?", o: ["stopIntent()", "stopService()", "pauseService()", "cancelService()"], a: 1 },
-    { q: "8. Connecting the widget to Dart Logic is the final step in the app-building journey to ensure it's ready for launch.", o: ["True", "False"], a: 0 },
-    { q: "9. Flutter supports Android and iOS with a single codebase.", o: ["True", "False"], a: 0 },
-    { q: "10. The conditional statement function is for displaying images only.", o: ["True", "False"], a: 1 },
-    { q: "11. Container allows the developer to control the aesthetic appearance of flutter designs.", o: ["True", "False"], a: 0 },
-    { q: "12. Flutter writes a single snippet code that works across multiple platforms without needing to rewrite it.", o: ["True", "False"], a: 0 },
-    { q: "13. The service in Android does not require a user interface to run.", o: ["True", "False"], a: 0 },
-    { q: "14. Which of the following compilers does Dart use during the development phase to enable the 'Hot Reload' feature?", o: ["JIT, Just-in-Time", "AOT, Ahead-of-Time", "Source Compiler", "Bridges"], a: 0 },
-    { q: "15. What is the fundamental difference between using const and final when defining constants in Dart?", o: ["The value of final can be changed once it is defined, while const never changes.", "A constant of type const consumes more memory than a constant of type final.", "const is used only for numbers, while final is used for strings and objects.", "The value of const is determined at compile time, while final is determined at runtime."], a: 3 },
-    { q: "16. When using the Runes type in Dart, what is its primary purpose?", o: ["To represent Unicode symbols in 32-bit format, such as emojis.", "To encrypt sensitive data before sending it to the server.", "To convert text to integers for performing calculations.", "To store very long strings of text to reduce memory consumption."], a: 0 },
-    { q: "17. What happens when you try to access an item in a List using a non-existent index?", o: ["The last item on the list is returned as a replacement.", "An application error occurs because access depends on an index starting from 0.", "The list adds an empty item at that location.", "The list automatically returns null"], a: 1 },
-    { q: "18. What role does the ??= operator play in Dart?", o: ["Check if two values are equal", "Assign a value to a variable only if its current value is null.", "Dynamically convert a variable from number to text", "Merge two strings into one variable."], a: 1 },
-    { q: "19. Which of the following is NOT a part of an Intent?", o: ["Action", "Data", "Layout", "Extras"], a: 2 },
-    { q: "20. Which of the following permissions require runtime approval?", o: ["INTERNET", "CAMERA", "VIBRATE", "WAKE_LOCK"], a: 1 },
-    { q: "21. Do-While ensures that the code is executed at least once before the condition is checked.", o: ["True", "False"], a: 0 },
-    { q: "22. Dart allows the definition of flexible functions.", o: ["True", "False"], a: 0 },
-    { q: "23. Linking two different databases is related to external databases.", o: ["True", "False"], a: 1 },
-    { q: "24. It returns true if the two values do not match.", o: ["True", "False"], a: 0 },
-    { q: "25. Using explicit statements about the types of code is preferable to make the code clearer and easier to read.", o: ["True", "False"], a: 0 },
-    { q: "26. requestPermissions () is used to ask the user for dangerous permissions.", o: ["True", "False"], a: 0 },
-    { q: "27. What is the primary function of the Material App library in Flutter?", o: ["It is used exclusively for formatting text and changing font colors.", "It acts as an internal database for storing user information.", "It provides a large collection of widgets that help in building the user interface (UI).", "It is used only to launch the application and specify the starting point."], a: 2 },
-    { q: "28. What does the runApp function represent in the Flutter application structure?", o: ["Interface User is an abbreviation for.", "It is used to define only invisible properties.", "It is the root, or starting point, from which the application runs.", "It is responsible for dividing the screen into AppBar and Body."], a: 2 },
-    { q: "29. What is the main difference between Stateful Widget and Stateless Widget?", o: ["iOS Stateful Widget (used only for Android) and Stateless Widget.", "Stateless is for a non-interactive page, while Stateful is for an interactive page.", "Stateless widgets are visible, and Stateful widgets are invisible.", "There is no difference between them."], a: 1 },
-    { q: "30. How can a programmer view all the available properties within a widget in the development environment?", o: ["Long-press the Enter key.", "Place a comma (,) after the text. Press Ctrl + Space.", "Write the word 'Widget' before the Property name.", "can only be viewed by reading the original library files."], a: 1 },
-    { q: "31. When setting text alignment, what is the difference between using 'start' and 'left'?", o: ["'start' is used only for images, and 'left' is used for text.", "'start' depends on the application language, while 'left' is always left-aligned.", "'left' makes the text start from the middle, while 'start' makes it start from the top.", "'left' is the same as 'start'; there is no difference in placement."], a: 1 },
-    { q: "32. What is the purpose of putExtra () in an Intent?", o: ["To close the current activity.", "To send data with the Intent.", "To request permission.", "To show a message."], a: 1 },
-    { q: "33. Which directory is used to store string resources?", o: ["/res/values", "/res/strings", "/res/text", "/res/resources"], a: 0 },
-    { q: "34. Scaffold widgets are considered invisible widgets.", o: ["True", "False"], a: 0 },
-    { q: "35. An error occurs if the color is defined in the container and the decoration is used at the same time.", o: ["True", "False"], a: 0 },
-    { q: "36. BorderRadius.circular() used to apply even curvature to all corners of the container.", o: ["True", "False"], a: 0 },
-    { q: "37. Padding refers to the outer margins that separate the container's contents from other elements.", o: ["True", "False"], a: 1 },
-    { q: "38. The infinite expansion is used to fill all available horizontal space.", o: ["True", "False"], a: 0 },
-    { q: "39. The /res/layout directory is used to store layout definitions.", o: ["True", "False"], a: 0 },
-    { q: "40. Where should the Positioned widget be defined to work correctly?", o: ["Container inside any.", "Only inside the Stack.", "Anywhere inside the Scaffold.", "Inside a Row to specify the distance from the left."], a: 1 },
-    { q: "41. Why does an error occur when using the top and height properties together in the same stack?", o: ["Because height requires only left and right.", "Because specifying height prevents the element from stretching between top and bottom.", "Because top always takes precedence over height.", "Because the stack does not support specifying height."], a: 1 },
-    { q: "42. What value should be assigned to the overflow property in the Stack to show elements that go outside its boundaries?", o: ["Overflow.none", "Overflow.clip", "Overflow.visib", "Overflow.scroll"], a: 2 },
-    { q: "43. What is the primary function of the Expanded widget when used within a Row?", o: ["Adding a shadow around the elements within the row.", "Centering the elements in the middle of the screen.", "Changing the background color of the element to match the screen.", "Automatically distributes the available space in the display among the elements."], a: 3 },
-    { q: "44. If we have 3 Expanded elements in a row, and we give the first one 2 flex points, the second one 1 flex point, and the third one 1 flex point, how much space will the first element occupy?", o: ["Three-quarters of the available space.", "20% of the available space.", "Twice the entire screen area.", "50% of the available space."], a: 3 },
-    { q: "45. What are the three main sections that make up the top application bar (AppBar) in Flutter?", o: ["Header, Body, Footer", "Icon, Text, Button", "Leading, Title, Actions", "Start, Center, End"], a: 2 },
-    { q: "46. What type of data does the elevation property in the AppBar except for shadow control?", o: ["Double", "Bool", "Int", "String"], a: 0 },
-    { q: "47. Stack arranges elements in layers facing each other .", o: ["True", "False"], a: 1 },
-    { q: "48. SizedBox has fewer properties and is used to specify size or spaces.", o: ["True", "False"], a: 0 },
-    { q: "49. The onPressed option cannot be used to create an ElevatedButton.", o: ["True", "False"], a: 0 },
-    { q: "50. InkWell offers the option to add a pressure reaction to any widget.", o: ["True", "False"], a: 0 },
-    { q: "51. The direction must be manually specified if it differs from the default column scrolling.", o: ["True", "False"], a: 0 },
-    { q: "52. The center's Tittle is used to control the positions of pre-existing texts.", o: ["True", "False"], a: 0 },
-    { q: "53. When should you use a Stateful Widget?", o: ["When we need to display static text and images that don't change.", "Only when you want to improve application performance and reduce memory consumption.", "When the user interface is static and doesn't require any data changes.", "When the page contains interactive elements, whose values change while the application is running."], a: 3 },
-    { q: "54. What is the primary function of setState in Flutter?", o: ["Delete all widgets from the screen and restart the application.", "Defining new variables within the Stateless Widget:", "Changing the value of variables only in the Debug Console screen without updating the interface.", "Informing the framework that the state has changed."], a: 3 },
-    { q: "55. What type of data should the items property in the Dropdown Button control accept?", o: ["Map<String, dynamic >.", "List<String >.", "List<DropdownMenuItem <String>>.", "List<Widget >."], a: 2 },
-    { q: "56. What makes the SwitchListTile widget different from a regular Switch widget?", o: ["It takes up the entire screen width and allows adding a title and icon next to the switch.", "It only works with text values and does not accept Boolean values.", "It is only used within a Stateless Widget and cannot be used in a Stateful Widget.", "Its color cannot be changed, and it always comes in the default blue color"], a: 0 },
-    { q: "57. What is the benefit of using the Global Key when dealing with the Snack Bar?", o: ["Accessing the Scaffold state to display the Snack Bar from anywhere within the code.", "Specifying the message display duration in seconds.", "Preventing the user from manually closing the Snack Bar.", "Automatically changing the background color of the Snack Bar."], a: 0 },
-    { q: "58. …………… is a user interface element for entering and modifying text.", o: ["TextView", "EditText", "Image", "Button"], a: 1 },
-    { q: "59. Which method connects the adapter to the Spinner?", o: ["setData()", "bindAdapter()", "setAdapter()", "addItems()"], a: 2 },
-    { q: "60. Floating disappears faster than Fixed.", o: ["True", "False"], a: 0 },
-    { q: "61. Actions are used to add buttons at the bottom of the window.", o: ["True", "False"], a: 0 },
-    { q: "62. Scrolling is used to display a fixed list that cannot be moved manually.", o: ["True", "False"], a: 0 },
-    { q: "63. Scroll Direction reverses the order of elements from bottom to top.", o: ["True", "False"], a: 1 },
-    { q: "64. Properties defined in a widget are stronger than inherited properties.", o: ["True", "False"], a: 0 },
-    { q: "65. Gridview contains a horizontally scrolling list of View objects, also often used with image icons.", o: ["True", "False"], a: 1 },
-    { q: "66. What property is used in the AppBar to control the value of the shadow that appears below it?", o: ["Background Color", "Shadow Color", "Brightness", "Elevation"], a: 3 },
-    { q: "67. Which of the following parts of the AppBar usually appears on the right and accepts a list of widgets?", o: ["Leading", "Flexible Space", "Actions", "Title"], a: 2 },
-    { q: "68. What procedure is required to programmatically open the drawer when an external button is pressed instead of swiping?", o: ["Use Navigator.push", "open Drawer and call Global Key < ScaffoldState < define.", "Automatically use the End Drawer property", "Change the bool value inside set State"], a: 1 },
-    { q: "69. What is the main functional difference between labelText and hintText?", o: ["The hintText accepts icons, while the labelText accepts only text.", "The labelText appears only inside the field, while the hintText appears above it.", "There is no difference between them, and both disappear when you start typing.", "The hintText disappears when you start typing, while the labelText rises to the top."], a: 3 },
-    { q: "70. Any property allows us
+            // Lecture 2 - MCQs
+            { lec: "Lecture 2", type: "MCQ", q: "Which of the following compilers does Dart use during the development phase to enable the \"Hot Reload\" feature?", answers: ["JIT, Just-in-Time", "AOT, Ahead-of-Time", "Source Compiler", "Bridges"], correct: 0 },
+            { lec: "Lecture 2", type: "MCQ", q: "What is the fundamental difference between using 'const' and 'final' when defining constants in Dart?", answers: ["The value of 'final' can be changed once it is defined, while 'const' never changes.", "A constant of type 'const' consumes more memory than a constant of type 'final'.", "const' is used only for numbers, while 'final' is used for strings and objects.", "The value of 'const' is determined at compile time, while 'final' is determined at runtime."], correct: 3 },
+            { lec: "Lecture 2", type: "MCQ", q: "When using the Runes type in Dart, what is its primary purpose?", answers: ["To represent Unicode symbols in 32-bit format, such as emojis.", "To encrypt sensitive data before sending it to the server.", "To convert text to integers for performing calculations.", "To store very long strings of text to reduce memory consumption."], correct: 0 },
+            { lec: "Lecture 2", type: "MCQ", q: "What happens when you try to access an item in a List using a non-existent index?", answers: ["The last item on the list is returned as a replacement.", "An application error occurs because access depends on an index starting from 0.", "The list adds an empty item at that location.", "The list automatically returns null"], correct: 1 },
+            { lec: "Lecture 2", type: "MCQ", q: "What role does the '??=' operator play in Dart?", answers: ["Check if two values are equal", "Assign a value to a variable only if its current value is null.", "Dynamically convert a variable from number to text", "Merge two strings into one variable."], correct: 1 },
+            { lec: "Lecture 2", type: "MCQ", q: "Which of the following is NOT a part of an Intent?", answers: ["Action", "Data", "Layout", "Extras"], correct: 2 },
+            { lec: "Lecture 2", type: "MCQ", q: "Which of the following permissions require runtime approval?", answers: ["INTERNET", "CAMERA", "VIBRATE", "WAKE_LOCK"], correct: 1 },
+            // Lecture 2 - T/F
+            { lec: "Lecture 2", type: "TF", q: "Do-While ensures that the code is executed at least once before the condition is checked.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 2", type: "TF", q: "Dart allows the definition of flexible functions.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 2", type: "TF", q: "Linking two different databases is related to external databases.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 2", type: "TF", q: "It returns true if the two values do not match.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 2", type: "TF", q: "Using explicit statements about the types of code is preferable to make the code clearer and easier to read.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 2", type: "TF", q: "requestPermissions() is used to ask the user for dangerous permissions.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+
+            // Lecture 3 - MCQs
+            { lec: "Lecture 3", type: "MCQ", q: "What is the primary function of the Material App library in Flutter?", answers: ["It is used exclusively for formatting text and changing font colors.", "It acts as an internal database for storing user information.", "It provides a large collection of widgets that help in building the user interface (UI).", "It is used only to launch the application and specify the starting point."], correct: 2 },
+            { lec: "Lecture 3", type: "MCQ", q: "What does the runApp function represent in the Flutter application structure?", answers: ["Interface User is an abbreviation for.", "It is used to define only invisible properties.", "It is the root, or starting point, from which the application runs.", "It is responsible for dividing the screen into AppBar and Body."], correct: 2 },
+            { lec: "Lecture 3", type: "MCQ", q: "What is the main difference between Stateful Widget and Stateless Widget?", answers: ["iOS Stateful Widget (used only for Android) and Stateless Widget.", "Stateless is for a non-interactive page, while Stateful is for an interactive page.", "Stateless widgets are visible, and Stateful widgets are invisible.", "There is no difference between them."], correct: 1 },
+            { lec: "Lecture 3", type: "MCQ", q: "How can a programmer view all the available properties within a widget in the development environment?", answers: ["Long-press the Enter key.", "Place a comma (,) after the text. Press Ctrl + Space.", "Write the word \"Widget\" before the Property name.", "Can only be viewed by reading the original library files."], correct: 1 },
+            { lec: "Lecture 3", type: "MCQ", q: "When setting text alignment, what is the difference between using 'start' and 'left'?", answers: ["'start' is used only for images, and 'left' is used for text.", "'start' depends on the application language, while 'left' is always left-aligned.", "'left' makes the text start from the middle, while 'start' makes it start from the top.", "'left' is the same as 'start'; there is no difference in placement."], correct: 1 },
+            { lec: "Lecture 3", type: "MCQ", q: "What is the purpose of putExtra() in an Intent?", answers: ["To close the current activity.", "To send data with the Intent.", "To request permission.", "To show a message."], correct: 1 },
+            { lec: "Lecture 3", type: "MCQ", q: "Which directory is used to store string resources?", answers: ["/res/values", "/res/strings", "/res/text", "/res/resources."], correct: 0 },
+            // Lecture 3 - T/F
+            { lec: "Lecture 3", type: "TF", q: "Scaffold widgets are considered invisible widgets.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 3", type: "TF", q: "An error occurs if the color is defined in the container and the decoration is used at the same time.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 3", type: "TF", q: "BorderRadius.circular() used to apply even curvature to all corners of the container.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 3", type: "TF", q: "Padding refers to the outer margins that separate the container's contents from other elements.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 3", type: "TF", q: "The infinite expansion is used to fill all available horizontal space.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 3", type: "TF", q: "The /res/layout directory is used to store layout definitions.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+
+            // Lecture 4 - MCQs
+            { lec: "Lecture 4", type: "MCQ", q: "Where should the Positioned widget be defined to work correctly?", answers: ["Container inside any.", "Only inside the Stack.", "Anywhere inside the Scaffold.", "Inside a Row to specify the distance from the left."], correct: 1 },
+            { lec: "Lecture 4", type: "MCQ", q: "Why does an error occur when using the top and height properties together in the same stack?", answers: ["Because height requires only left and right.", "Because specifying height prevents the element from stretching between top and bottom.", "Because top always takes precedence over height.", "Because the stack does not support specifying height."], correct: 1 },
+            { lec: "Lecture 4", type: "MCQ", q: "What value should be assigned to the overflow property in the Stack to show elements that go outside its boundaries?", answers: ["Overflow.none", "Overflow.clip", "Overflow.visible", "Overflow.scroll"], correct: 2 },
+            { lec: "Lecture 4", type: "MCQ", q: "What is the primary function of the Expanded widget when used within a Row?", answers: ["Adding a shadow around the elements within the row.", "Centering the elements in the middle of the screen.", "Changing the background color of the element to match the screen.", "Automatically distributes the available space in the display among the elements."], correct: 3 },
+            { lec: "Lecture 4", type: "MCQ", q: "If we have 3 Expanded elements in a row, and we give the first one 2 flex points, the second one 1 flex point, and the third one 1 flex point, how much space will the first element occupy?", answers: ["Three-quarters of the available space.", "20% of the available space.", "Twice the entire screen area.", "50% of the available space."], correct: 3 },
+            { lec: "Lecture 4", type: "MCQ", q: "What are the three main sections that make up the top application bar (AppBar) in Flutter?", answers: ["Header, Body, Footer.", "Icon, Text, Button.", "Leading, Title, Actions.", "Start, Center, End."], correct: 2 },
+            { lec: "Lecture 4", type: "MCQ", q: "What type of data does the elevation property in the AppBar except for shadow control?", answers: ["Double", "Bool", "Int", "String"], correct: 0 },
+            // Lecture 4 - T/F
+            { lec: "Lecture 4", type: "TF", q: "Stack arranges elements in layers facing each other.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 4", type: "TF", q: "SizedBox has fewer properties and is used to specify size or spaces.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 4", type: "TF", q: "The onPressed option cannot be used to create an ElevatedButton.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 4", type: "TF", q: "InkWell offers the option to add a pressure reaction to any widget.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 4", type: "TF", q: "The direction must be manually specified if it differs from the default column scrolling.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 4", type: "TF", q: "The center's Title is used to control the positions of pre-existing texts.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+
+            // Lecture 5 - MCQs
+            { lec: "Lecture 5", type: "MCQ", q: "When should you use a Stateful Widget?", answers: ["When we need to display static text and images that don't change.", "Only when you want to improve application performance and reduce memory consumption.", "When the user interface is static and doesn't require any data changes.", "When the page contains interactive elements, whose values change while the application is running."], correct: 3 },
+            { lec: "Lecture 5", type: "MCQ", q: "What is the primary function of 'setState' in Flutter?", answers: ["Delete all widgets from the screen and restart the application.", "Defining new variables within the Stateless Widget.", "Changing the value of variables only in the Debug Console screen without updating the interface.", "Informing the framework that the state has changed."], correct: 3 },
+            { lec: "Lecture 5", type: "MCQ", q: "What type of data should the items property in the Dropdown Button control accept?", answers: ["Map<String, dynamic>", "List<String>", "List<DropdownMenuItem<String>>", "List<Widget>"], correct: 2 },
+            { lec: "Lecture 5", type: "MCQ", q: "What makes the SwitchListTile widget different from a regular Switch widget?", answers: ["It takes up the entire screen width and allows adding a title and icon next to the switch.", "It only works with text values and does not accept Boolean values.", "It is only used within a Stateless Widget and cannot be used in a Stateful Widget.", "Its color cannot be changed, and it always comes in the default blue color"], correct: 0 },
+            { lec: "Lecture 5", type: "MCQ", q: "What is the benefit of using the Global Key when dealing with the Snack Bar?", answers: ["Accessing the Scaffold state to display the Snack Bar from anywhere within the code.", "Specifying the message display duration in seconds.", "Preventing the user from manually closing the Snack Bar.", "Automatically changing the background color of the Snack Bar."], correct: 0 },
+            { lec: "Lecture 5", type: "MCQ", q: "...... is a user interface element for entering and modifying text.", answers: ["TextView", "EditText", "Image", "Button"], correct: 1 },
+            { lec: "Lecture 5", type: "MCQ", q: "Which method connects the adapter to the Spinner?", answers: ["setData()", "bindAdapter()", "setAdapter()", "addItems()"], correct: 2 },
+            // Lecture 5 - T/F
+            { lec: "Lecture 5", type: "TF", q: "Floating disappears faster than Fixed.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 5", type: "TF", q: "Actions are used to add buttons at the bottom of the window.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 5", type: "TF", q: "Scrolling is used to display a fixed list that cannot be moved manually.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 5", type: "TF", q: "Scroll Direction reverses the order of elements from bottom to top.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 5", type: "TF", q: "Properties defined in a widget are stronger than inherited properties.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 5", type: "TF", q: "Gridview contains a horizontally scrolling list of View objects, also often used with image icons.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+
+            // Lecture 6 - MCQs
+            { lec: "Lecture 6", type: "MCQ", q: "What property is used in the AppBar to control the value of the shadow that appears below it?", answers: ["Background Color", "Shadow Color", "Brightness", "Elevation"], correct: 3 },
+            { lec: "Lecture 6", type: "MCQ", q: "Which of the following parts of the AppBar usually appears on the right and accepts a list of widgets?", answers: ["Leading", "Flexible Space", "Actions", "Title"], correct: 2 },
+            { lec: "Lecture 6", type: "MCQ", q: "What procedure is required to programmatically open the drawer when an external button is pressed instead of swiping?", answers: ["Use Navigator.push.", "openDrawer and call GlobalKey<ScaffoldState> define.", "Automatically use the End Drawer property.", "Change the bool value inside setState."], correct: 1 },
+            { lec: "Lecture 6", type: "MCQ", q: "What is the main functional difference between labelText and hintText?", answers: ["The hintText accepts icons, while the labelText accepts only text.", "The labelText appears only inside the field, while the hintText appears above it.", "There is no difference between them, and both disappear when you start typing.", "The hint Text disappears when you start typing, while the labelText rises to the top."], correct: 3 },
+            { lec: "Lecture 6", type: "MCQ", q: "Any property allows us to control the color of the transparent background?", answers: ["Background Color", "Shadow Color", "Splash Color", "Drawer Scrim Color"], correct: 3 },
+            { lec: "Lecture 6", type: "MCQ", q: "What type of object is based on the onClick (View v) method when the button is clicked?", answers: ["Button", "View", "Context", "Layout"], correct: 1 },
+            { lec: "Lecture 6", type: "MCQ", q: "Which attribute adds an icon to the left side of a Button?", answers: ["android:text", "android:onClick", "android:drawableLeft", "android:layout_width"], correct: 2 },
+            // Lecture 6 - T/F
+            { lec: "Lecture 6", type: "TF", q: "The Filled property is activated to color the Text Form Field property.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 6", type: "TF", q: "Int is the data type accepted by the current index property.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 6", type: "TF", q: "Leading Padding allows you to define the horizontal area with the front element.", answers: ["True (صح)", "False (خطأ)"], correct: 1 },
+            { lec: "Lecture 6", type: "TF", q: "The Prefix Icon appears at the beginning of the field before the input text.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 6", type: "TF", q: "One of the available cases for the brightness in AppBar feature are Dark and Light.", answers: ["True (صح)", "False (خطأ)"], correct: 0 },
+            { lec: "Lecture 6", type: "TF", q: "Translating animation is used to rotate the object around its axis.", answers: ["True (صح)", "False (خطأ)"], correct: 1 }
+        ];
+
+        let currentIndex = 0;
+        let correctScore = 0;
+        let wrongScore = 0;
+        let optionSelected = false;
+
+        // استدعاء العناصر من الـ DOM
+        const progressText = document.getElementById("progress-text");
+        const correctCount = document.getElementById("correct-count");
+        const wrongCount = document.getElementById("wrong-count");
+        const barFill = document.getElementById("bar-fill");
+        const lectureTitle = document.getElementById("lecture-title");
+        const questionBody = document.getElementById("question-body");
+        const optionsBox = document.getElementById("options-box");
+        const nextBtn = document.getElementById("next-btn");
+
+        const questionScreen = document.getElementById("question-screen");
+        const resultScreen = document.getElementById("result-screen");
+        const finalPercent = document.getElementById("final-percent");
+        const finalRatio = document.getElementById("final-ratio");
+
+        // دالة تشغيل وعرض السؤال الحالي
+        function loadQuestion() {
+            optionSelected = false;
+            nextBtn.disabled = true;
+            optionsBox.innerHTML = "";
+
+            if (currentIndex >= quizData.length) {
+                showResults();
+                return;
+            }
+
+            const currentData = quizData[currentIndex];
+
+            // تحديث شريط البيانات العلوي
+            progressText.textContent = `سؤال ${currentIndex + 1} / ${quizData.length}`;
+            lectureTitle.textContent = currentData.lec;
+            questionBody.textContent = currentData.q;
+
+            // حساب ورسم نسبة شريط التقدم الأزرق
+            const progressPercent = ((currentIndex) / quizData.length) * 100;
+            barFill.style.width = `${progressPercent}%`;
+
+            // بناء أزرار الخيارات التفاعلية
+            currentData.answers.forEach((ans, index) => {
+                const button = document.createElement("button");
+                button.className = "option-btn";
+                button.textContent = ans;
+                button.onclick = () => checkAnswer(index, button);
+                optionsBox.appendChild(button);
+            });
+        }
+
+        // دالة التحقق من صحة الإجابة وضبط الألوان التفاعلية فوراً
+        function checkAnswer(selectedIndex, clickedButton) {
+            if (optionSelected) return; // منع الضغط المتعدد
+            optionSelected = true;
+
+            const currentData = quizData[currentIndex];
+            const allButtons = optionsBox.querySelectorAll(".option-btn");
+
+            // تعطيل كافة الأزرار فور الضغط
+            allButtons.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === currentData.correct) {
+                // إجابة صحيحة
+                clickedButton.classList.add("correct-ans");
+                correctScore++;
+                correctCount.textContent = `✔ ${correctScore}`;
+            } else {
+                // إجابة خاطئة
+                clickedButton.classList.add("wrong-ans");
+                // إظهار الإجابة الصحيحة بلونها الأخضر للمساعدة في المذاكرة
+                allButtons[currentData.correct].classList.add("correct-ans");
+                wrongScore++;
+                wrongCount.textContent = `✖ ${wrongScore}`;
+            }
+
+            nextBtn.disabled = false;
+        }
+
+        // الانتقال للسؤال التالي
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
+        }
+
+        // عرض الشاشة النهائية وحساب الإحصائيات
+        function showResults() {
+            questionScreen.style.display = "none";
+            resultScreen.style.display = "block";
+            barFill.style.width = "100%";
+
+            const percentage = Math.round((correctScore / quizData.length) * 100);
+            finalPercent.textContent = `${percentage}%`;
+            finalRatio.textContent = `${correctScore} / ${quizData.length}`;
+        }
+
+        // إعادة تشغيل الاختبار من الصفر
+        function resetQuiz() {
+            currentIndex = 0;
+            correctScore = 0;
+            wrongScore = 0;
+            correctCount.textContent = "✔ 0";
+            wrongCount.textContent = "✖ 0";
+            resultScreen.style.display = "none";
+            questionScreen.style.display = "block";
+            loadQuestion();
+        }
+
+        // تشغيل التطبيق تلقائياً عند الفتح
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
